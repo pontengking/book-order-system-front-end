@@ -1,16 +1,39 @@
-# React + Vite
+# Bookkeeper
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React application for book management, built with hooks and Material UI. Includes paginated title search, creation, editing, stock adjustment, and removal only at zero stock. No order features.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requires Node.js 22.12+ and the backend at http://localhost:8080.
 
-## React Compiler
+```sh
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Open the URL printed by Vite (normally http://localhost:5173).
 
-## Expanding the ESLint configuration
+The Vite server proxies `/api` to the backend and supplies HTTP Basic authentication using the provided local credentials (`book` / `book`). Credentials are not included in the browser bundle. To override local settings, create `.env.local` using `.env.example`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## API integration
+
+- `POST /books/search`: paginated listing and title search.
+- `POST /books/save`: create a book.
+- `PUT /books/{id}`: edit details or stock.
+- `DELETE /books/{id}`: remove a zero-stock book.
+
+The client unwraps the backend's `{ status, errorDesc, data }` responses and handles both HTTP errors and `FAIL` responses. Prices have a minimum of 0.01; quantity is a nonnegative 32-bit integer. Failed saves keep the form open.
+
+## Verification
+
+```sh
+npm run lint
+npm run build
+npm run test:e2e
+```
+
+The Playwright test uses installed Google Chrome and the live backend. It creates a uniquely named temporary book, verifies create/edit, search, persistence, stock controls, validation, removal, and mobile layout, then cleans up its own record. Screenshots are written to `test-results/`.
+
+## Deployment
+
+`npm run build` creates `dist/`. `npm run preview` serves it with the same local API proxy for verification. A production host must provide an equivalent server-side `/api` proxy and authentication; Vite's proxy is not part of the static build. Override `VITE_API_BASE_URL` only when an alternative server endpoint is configured to handle authentication and CORS. Never put API passwords in `VITE_` variables.
