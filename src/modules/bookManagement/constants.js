@@ -1,0 +1,2 @@
+export const BOOK_PAGE_SIZE = 10
+export const MAX_BOOK_QUANTITY = 2147483647
